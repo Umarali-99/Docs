@@ -105,8 +105,25 @@ sudo systemctl status kibana
 
 Now Kibana is ready!!!
 
+# Install APM Server on Amazon Linux 2
+
+**Download and install apm server**
+```Shell
+curl -L -O https://artifacts.elastic.co/downloads/apm-server/apm-server-7.15.2-x86_64.rpm
+sudo rpm -vi apm-server-7.15.2-x86_64.rpm
+```
+Enable the service 
+```Shell
+sudo systemctl enable kibana
+```
+Start the service
+```Shell
+sudo systemctl start kibana
+```
 # Setup minimal security for Elasticsearch
 
 Refer this documentaion and configure basic authentication. [Setup minimal securtiy for Elasticsearch](https://www.elastic.co/guide/en/elasticsearch/reference/7.17/security-minimal-setup.html).
 
 Save the generated passwords. You’ll need them to add the built-in user to Kibana.
+
+
