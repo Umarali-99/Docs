@@ -1,37 +1,112 @@
-## Welcome to GitHub Pages
+## How to install elasticsearch on amazon linux 2
 
-You can use the [editor on GitHub](https://github.com/Umarali-99/Docs/edit/gh-pages/index.md) to maintain and preview the content for your website in Markdown files.
+**Step 1**: Install Java
 
-Whenever you commit to this repository, GitHub Pages will run [Jekyll](https://jekyllrb.com/) to rebuild the pages in your site, from the content in your Markdown files.
+```Shell
+sudo amazon-linux-extras install java-openjdk11
+```
+**Make sure JAVA_HOME environment variable is configured**
 
-### Markdown
+```Shell
+export JAVA_HOME=/usr/lib/jvm/java-11-openjdk-amd64
+```
+**Step 2**: Install Elasticsearch on Amazon linux 2
 
-Markdown is a lightweight and easy-to-use syntax for styling your writing. It includes conventions for
+Accept the Elasticsearch GPG Key:
 
-```markdown
-Syntax highlighted code block
+```Shell
 
-# Header 1
-## Header 2
-### Header 3
+sudo rpm --import https://artifacts.elastic.co/GPG-KEY-elasticsearch
 
-- Bulleted
-- List
-
-1. Numbered
-2. List
-
-**Bold** and _Italic_ and `Code` text
-
-[Link](url) and ![Image](src)
 ```
 
-For more details see [Basic writing and formatting syntax](https://docs.github.com/en/github/writing-on-github/getting-started-with-writing-and-formatting-on-github/basic-writing-and-formatting-syntax).
+Create a file called elasticsearch.repo in the `/etc/yum.repos.d/` directory, :
 
-### Jekyll Themes
+```Shell
+sudo vi /etc/yum.repos.d/elasticsearch.repo
+```
+Add ELK repository on Amazon Linux 2
 
-Your Pages site will use the layout and styles from the Jekyll theme you have selected in your [repository settings](https://github.com/Umarali-99/Docs/settings/pages). The name of this theme is saved in the Jekyll `_config.yml` configuration file.
+```yaml
 
-### Support or Contact
+[elasticsearch-7.x]
+name=Elasticsearch repository for 7.x packages
+baseurl=https://artifacts.elastic.co/packages/7.x/yum
+gpgcheck=1
+gpgkey=https://artifacts.elastic.co/GPG-KEY-elasticsearch
+enabled=1
+autorefresh=1
+type=rpm-md
 
-Having trouble with Pages? Check out our [documentation](https://docs.github.com/categories/github-pages-basics/) or [contact support](https://support.github.com/contact) and we’ll help you sort it out.
+```
+Install Elasticsearch:
+
+```Shell
+sudo yum install --enablerepo=elasticsearch elasticsearch
+```
+You can start or stop using this commands:
+```Shell
+sudo systemctl start elasticsearch
+OR
+sudo systemctl stop elasticsearch
+``` 
+Run the command: 
+```Shell
+sudo /bin/systemctl daemon-reload
+```
+Ruin the command:
+```Shell
+sudo /bin/systemctl enable elasticsearch.service
+```
+
+To verify that Elasticsearch is running, use curl to send an HTTP request to 
+```Curl
+curl -X GET "localhost:9200/"
+```
+**Step 3**: Configure Elasticsearch
+```Shell
+sudo vi /etc/elasticsearch/elasticsearch.yml
+```
+Set an ip address to expose this node on network, Here we are opened all the address.
+```yaml
+network.host: 0.0.0.0
+```
+After edited the file, restart the service
+```Shell
+sudo systemctl restart elasticsearch
+```
+Now the Elasticsearch is ready!!!
+
+# Install and configure Kibana on Amazon Linux 2
+
+Download and install kibana 
+```
+wget https://artifacts.elastic.co/downloads/kibana/kibana-7.17.2-x86_64.rpm
+```
+```Shell
+sudo rpm --install kibana-7.17.2-x86_64.rpm
+```
+Enable the service 
+```Shell
+sudo systemctl enable kibana
+```
+Now add the line into this: `sudo vi /etc/kibana/kibana.yml`
+```Shell
+server.host: "0.0.0.0"
+elasticsearch.hosts: ["http://localhost:9200"]
+```
+Run the command:
+```Shell
+sudo systemctl restart kibana
+```
+```Shell
+sudo systemctl status kibana
+```
+
+Now Kibana is ready!!!
+
+# Setup minimal security for Elasticsearch
+
+Refer this documentaion and configure basic authentication. [Setup minimal securtiy for Elasticsearch](https://www.elastic.co/guide/en/elasticsearch/reference/7.17/security-minimal-setup.html).
+
+Save the generated passwords. You’ll need them to add the built-in user to Kibana.
